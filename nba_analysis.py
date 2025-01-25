@@ -4,15 +4,40 @@ import seaborn as sns
 import plotly.express as px
 import numpy as np
 import streamlit as st
+import os
+import zipfile
+
 
 # Load datasets
 def load_data():
-    games = pd.read_csv("games.csv")
-    teams = pd.read_csv("teams.csv")
-    players = pd.read_csv("players.csv")
-    games_details = pd.read_csv("games_details.csv", low_memory=False)
-    ranking = pd.read_csv("ranking.csv")
+    # Path to the ZIP file
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    zip_file_path = os.path.join(current_dir, "datasets.zip")  # Ensure the ZIP file is named `datasets.zip`
+
+    # Directory to extract the datasets
+    extract_dir = os.path.join(current_dir, "extracted_datasets")
+
+    # Extract the ZIP file if not already extracted
+    if not os.path.exists(extract_dir):
+        with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
+            zip_ref.extractall(extract_dir)
+
+    # Build the file paths for each dataset
+    games_path = os.path.join(extract_dir, "games.csv")
+    teams_path = os.path.join(extract_dir, "teams.csv")
+    players_path = os.path.join(extract_dir, "players.csv")
+    games_details_path = os.path.join(extract_dir, "games_details.csv")
+    ranking_path = os.path.join(extract_dir, "ranking.csv")
+
+    # Load the datasets
+    games = pd.read_csv(games_path)
+    teams = pd.read_csv(teams_path)
+    players = pd.read_csv(players_path)
+    games_details = pd.read_csv(games_details_path, low_memory=False)
+    ranking = pd.read_csv(ranking_path)
+
     return games, teams, players, games_details, ranking
+
 
 # Task 1: Compare Team Performance Across Seasons and Games with enhanced filters
 def team_performance_across_seasons(ranking, teams):
